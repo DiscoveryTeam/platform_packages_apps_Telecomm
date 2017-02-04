@@ -796,7 +796,7 @@ public class Call implements CreateConnectionResponse {
             // call, it will remain so for the rest of it's lifetime.
             if (!mIsEmergencyCall) {
                 mIsEmergencyCall = mHandle != null && TelephonyUtil.isLocalEmergencyNumber(
-                        mHandle.getSchemeSpecificPart());
+                        mContext, mHandle.getSchemeSpecificPart());
             }
             startCallerInfoLookup();
             for (Listener l : mListeners) {
@@ -1983,17 +1983,14 @@ public class Call implements CreateConnectionResponse {
     public void setVideoProvider(IVideoProvider videoProvider) {
         Log.v(this, "setVideoProvider");
 
-        if (mVideoProviderProxy != null) {
-            mVideoProviderProxy.clearVideoCallback();
-            mVideoProviderProxy = null;
-        }
-
         if (videoProvider != null ) {
             try {
                 mVideoProviderProxy = new VideoProviderProxy(mLock, videoProvider, this);
             } catch (RemoteException ignored) {
                 // Ignore RemoteException.
             }
+        } else {
+            mVideoProviderProxy = null;
         }
 
         mVideoProvider = videoProvider;
